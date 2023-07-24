@@ -1,2 +1,2 @@
-# SQL_Data_Cleaning
+# SQL
 Techniques of cleaning data, using MSSQL
