@@ -1,5 +1,5 @@
 # SQL
-Structured Query Language is a super important language used to manage databases.
+Structured Query Language is a super important language used to deal with databases.
 I've made some projects using SQL, and want to share a little about them:
 
 **(I) - Data Cleaning with SQL Server - Walkthrough**  
