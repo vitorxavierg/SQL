@@ -34,7 +34,7 @@ FROM [Portfolio Project].dbo.HousingProject
 ORDER BY ParcelID;
 
 
-/* Checking registers that have null 'PropertyAddress' but the same ParceLID and different 'UniqueID'.
+/* Checking registers that have null 'PropertyAddress' but the same ParcelID and different 'UniqueID'.
    The goal here is to use PropertyAddress values from the same ParcelID to fill the null ones. */
 SELECT x.ParcelID,
        x.PropertyAddress,
@@ -176,7 +176,7 @@ FROM CTE_RowNum
 WHERE ROW_NUM > 1;
 
 
--- Checking if the query above is empty, since all duplicated have been deleted
+-- Checking if the query above is empty, since all duplicates have been deleted
 WITH CTE_RowNum AS
   (SELECT *,
           ROW_NUMBER() OVER (PARTITION BY ParcelID,
