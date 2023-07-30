@@ -1,5 +1,6 @@
 --(1) - Exploring the Dataset
 
+-- Checking the dataset
 SELECT *
 FROM [Portfolio Project].dbo.HousingProject;
 ----------------------------------------------------------------------------\\-----------------------
@@ -33,8 +34,8 @@ FROM [Portfolio Project].dbo.HousingProject
 ORDER BY ParcelID;
 
 
--- Checking registers that have null 'PropertyAddress' but the same ParceLID and different 'UniqueID'
--- The goal here is to use PropertyAddress values from the same ParcelID to fill the null ones.
+/* Checking registers that have null 'PropertyAddress' but the same ParceLID and different 'UniqueID'.
+   The goal here is to use PropertyAddress values from the same ParcelID to fill the null ones. */
 SELECT x.ParcelID,
        x.PropertyAddress,
        y.ParcelID,
@@ -55,14 +56,14 @@ WHERE x.PropertyAddress IS NULL
 ----------------------------------------------------------------------------\\-----------------------
 --(4) - Breaking out column’s content into distinct columns
 
-# Checking OwnerAddres column an ordering DESC
+-- Checking OwnerAddres column an ordering DESC
 SELECT OwnerAddress
 FROM [Portfolio Project].dbo.HousingProject
 ORDER BY 1 DESC;
 
 
-# Parsing OwnerAddress column using PARSENAME
-# The REPLACE is used because the default parser for PARSENAME is '.'
+/* Parsing OwnerAddress column using PARSENAME.
+   The REPLACE is used because the default delimiter for PARSENAME is '.' */
 SELECT PARSENAME(REPLACE(OwnerAddress, ',', '.'), 3) AS SplittedOwnerAddress,
        PARSENAME(REPLACE(OwnerAddress, ',', '.'), 2) AS SplittedOwnerCity,
        PARSENAME(REPLACE(OwnerAddress, ',', '.'), 1) AS SplittedOwnerState
@@ -70,46 +71,46 @@ FROM [Portfolio Project].dbo.HousingProject
 ORDER BY 1 DESC;
 
 
-# Creating SplittedOwnerAddress column
+-- Creating SplittedOwnerAddress column
 ALTER TABLE [Portfolio Project].dbo.HousingProject ADD SplittedOwnerAddress NVARCHAR(255);
 
 
-# Creating SplittedOwnerCity column
+-- Creating SplittedOwnerCity column
 ALTER TABLE [Portfolio Project].dbo.HousingProject ADD SplittedOwnerCity NVARCHAR(255);
 
 
-# Creating SplittedOwnerState column
+-- Creating SplittedOwnerState column
 ALTER TABLE [Portfolio Project].dbo.HousingProject ADD SplittedOwnerState NVARCHAR(255);
 
 
-# Updating the SplittedOwnerAddress with the split 
+-- Updating the SplittedOwnerAddress with the split 
 UPDATE [Portfolio Project].dbo.HousingProject
 SET SplittedOwnerAddress = PARSENAME(REPLACE(OwnerAddress, ',', '.'), 3);
 
 
-# Updating the SplittedOwnerAddress with the split
+-- Updating the SplittedOwnerAddress with the split
 UPDATE [Portfolio Project].dbo.HousingProject
 SET SplittedOwnerCity = PARSENAME(REPLACE(OwnerAddress, ',', '.'), 2);
 
 
-# Updating the SplittedOwnerAddress with the split
+-- Updating the SplittedOwnerAddress with the split
 UPDATE [Portfolio Project].dbo.HousingProject
 SET SplittedOwnerState = PARSENAME(REPLACE(OwnerAddress, ',', '.'), 1);
 
 
-# Checking the created splitted columns
+-- Checking the created splitted columns
 SELECT *
 FROM [Portfolio Project].dbo.HousingProject;
 ----------------------------------------------------------------------------\\-----------------------
 --(5) - Fixing String Typos
 
-# Checking the existance of the same register with typos
+-- Checking the existance of the same register with typos
 SELECT SoldAsVacant, COUNT(SoldAsVacant) as Number_of_Registers
 FROM [Portfolio Project].DBO.HousingProject
 GROUP BY SoldAsVacant;
 
 
-# Applying case when to transform all registers of SoldAsVacant into 'Yes' or 'No'
+-- Applying case when to transform all registers of SoldAsVacant into 'Yes' or 'No'
 SELECT SoldAsVacant,
        CASE
            WHEN SoldAsVacant = 'N' THEN 'No'
@@ -119,7 +120,7 @@ SELECT SoldAsVacant,
 FROM [Portfolio Project].DBO.HousingProject;
 
 
-# Updating SoldAsVacant to standardize registers to 'Yes' or 'No'
+-- Updating SoldAsVacant to standardize registers to 'Yes' or 'No'
 UPDATE [Portfolio Project].DBO.HousingProject
 SET SoldAsVacant = CASE
                        WHEN SoldAsVacant = 'N' THEN 'No'
@@ -128,13 +129,13 @@ SET SoldAsVacant = CASE
                    END;
                    
                    
-# Checking if is there only 'Yes' or 'No' in the updated SoldAsVacant column
+-- Checking if is there only 'Yes' or 'No' in the updated SoldAsVacant column
 SELECT DISTINCT SoldAsVacant
 FROM [Portfolio Project].dbo.HousingProject;
 ----------------------------------------------------------------------------\\-----------------------  
 --(6) - Removing Duplicated Rows
 
-# Applying window function to get the registers that have same ParcelID, PropertyAddress, SaleDate, SalePrice and LegalReference
+-- Applying window function to get the registers that have same ParcelID, PropertyAddress, SaleDate, SalePrice and LegalReference
 SELECT *,
        ROW_NUMBER() OVER (PARTITION BY ParcelID,
                                        PropertyAddress,
@@ -145,7 +146,7 @@ SELECT *,
 FROM [Portfolio Project].DBO.HousingProject;
 
 
-# Filtering ROW_NUM > 1 to get duplicated registers
+-- Filtering ROW_NUM > 1 to get duplicated registers
 WITH CTE_RowNum AS
   (SELECT *,
           ROW_NUMBER() OVER (PARTITION BY ParcelID,
@@ -160,7 +161,7 @@ FROM CTE_RowNum
 WHERE ROW_NUM > 1;
 
 
-# Deleting duplicated registers with ROW_NUM > 1
+-- Deleting duplicated registers with ROW_NUM > 1
 WITH CTE_RowNum AS
   (SELECT *,
           ROW_NUMBER() OVER (PARTITION BY ParcelID,
@@ -175,7 +176,7 @@ FROM CTE_RowNum
 WHERE ROW_NUM > 1;
 
 
-# Checking if the query above is empty, since all duplicated have been deleted
+-- Checking if the query above is empty, since all duplicated have been deleted
 WITH CTE_RowNum AS
   (SELECT *,
           ROW_NUMBER() OVER (PARTITION BY ParcelID,
